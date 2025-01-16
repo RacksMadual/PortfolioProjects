@@ -29,22 +29,12 @@ order by PercentPopulationInfected desc
 --LETS BREAK DOWN DATA BY CONTINENT
 -- Showing Countries with the Highest Death Count Per Population
 
-Select location, MAX(cast(total_deaths as int)) as TotalDeathCount
+Select continent, MAX(cast(total_deaths as int)) as TotalDeathCount
 From PortfolioProject..CovidDeaths$
 --where location like '%South Africa%'
 where continent is not null
-Group by location
-order by TotalDeathCount desc
-
-
---Showing continents with the highest death count per population
-
- Select continent, MAX(cast(total_deaths as int)) as TotalDeathCount
-From PortfolioProject..CovidDeaths$
---Where location like '%South Africa%'
 Group by continent
 order by TotalDeathCount desc
-
 
 
 -- GLOBAL NUMBERS
@@ -55,8 +45,21 @@ where continent is not null
 Group by date
 order by 1,2
 
+-- Total Population vs Vaccinations
+-- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
---CTE
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(CONVERT(int,vac.new_vaccinations)) OVER (Partition by dea.Location Order by dea.location, dea.Date) as RollingPeopleVaccinated
+--, (RollingPeopleVaccinated/population)*100
+From PortfolioProject..CovidDeaths$ dea
+Join PortfolioProject..CovidVaccinations vac
+	On dea.location = vac.location
+	and dea.date = vac.date
+where dea.continent is not null 
+order by 2,3
+
+
+-- Using CTE to perform calculation
 With PopvsVac(Continent,location, Date, Population, new_vaccinations, RollingPeopleVaccinated)
 
 as
@@ -75,6 +78,7 @@ where dea.continent is not null
 
 Select *, (RollingPeopleVaccinated/Population)*100
 From PopvsVac
+
 
 --TEMP Table
 DROP Table if exists ##PercentPopulationVaccinated
