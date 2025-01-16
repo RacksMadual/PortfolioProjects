@@ -4,36 +4,35 @@ where continent is not null
 order by 3,4
 
 --Select data that we are going to be using
-Select continent, date, total_cases, new_cases, total_deaths, population  
+Select location, date, total_cases, new_cases, total_deaths, population  
 From PortfolioProject..CovidDeaths$
 where continent is not null
-order by 3,4
+order by 1,2
 
 --Looking at Total Cases vs Total Deaths
 --Shows what percentage of continent got Covid
-Select continent, date, total_cases, Population, (total_cases/population) *100 as PercentPopulationInfected
+Select location, date, total_cases, Population, (total_cases/population) *100 as PercentPopulationInfected
 From PortfolioProject..CovidDeaths$
-Where location like '%South Africa%'
+Where location like '%Africa%'
+and continent is not null
 order by 1,2
 
+
 --Looking at Countries with Highest Infection Rate compared to Population
- Select continent, Population, MAX(total_cases) as HighestInfectionCount, MAX ((total_cases/population)) *100 as
+ Select location, Population, MAX(total_cases) as HighestInfectionCount, MAX ((total_cases/population)) *100 as
  PercentPopulationInfected
 From PortfolioProject..CovidDeaths$
-where location like '%South Africa%'
-Group by continent, population
+--where location like '%South Africa%'
+Group by location, population
 order by PercentPopulationInfected desc
 
 --LETS BREAK DOWN DATA BY CONTINENT
-
-
 -- Showing Countries with the Highest Death Count Per Population
-
-
 
 Select location, MAX(cast(total_deaths as int)) as TotalDeathCount
 From PortfolioProject..CovidDeaths$
-where location like '%South Africa%'
+--where location like '%South Africa%'
+where continent is not null
 Group by location
 order by TotalDeathCount desc
 
